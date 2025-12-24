@@ -53,6 +53,34 @@
       "last_modified": "2025-12-21T10:48:17Z",
       "resolved": "github:NixOS/nixpkgs/306ea70f9eb0fb4e040f8540e2deab32ed7e2055?lastModified=1766314097"
     },
+    "glibcLocales@latest": {
+      "last_modified": "2025-11-23T21:50:36Z",
+      "resolved": "github:NixOS/nixpkgs/ee09932cedcef15aaf476f9343d1dea2cb77e261#glibcLocales",
+      "source": "devbox-search",
+      "version": "2.40-66",
+      "systems": {
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lhf8phvkgmlqr5ys1bgfr4g38b3l95kd-glibc-locales-2.40-66",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/lhf8phvkgmlqr5ys1bgfr4g38b3l95kd-glibc-locales-2.40-66"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hjlkypp9lpxwzsjycpy7nqg2mnl7qhzv-glibc-locales-2.40-66",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hjlkypp9lpxwzsjycpy7nqg2mnl7qhzv-glibc-locales-2.40-66"
+        }
+      }
+    },
     "go@1.25.4": {
       "last_modified": "2025-11-23T21:50:36Z",
       "resolved": "github:NixOS/nixpkgs/ee09932cedcef15aaf476f9343d1dea2cb77e261#go",
@@ -98,6 +126,75 @@
             }
           ],
           "store_path": "/nix/store/0a3dyfq09dnkw28ap2i450wjimvdmv6s-go-1.25.4"
+        }
+      }
+    },
+    "mariadb@11.8.3": {
+      "last_modified": "2025-11-23T21:50:36Z",
+      "plugin_version": "0.0.4",
+      "resolved": "github:NixOS/nixpkgs/ee09932cedcef15aaf476f9343d1dea2cb77e261#mariadb_118",
+      "source": "devbox-search",
+      "version": "11.8.3",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ldygz3dmi8clh8ixwysapjj77ryxkvm5-mariadb-server-11.8.3",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/nllg3p6x1nx1kpnbnq7wh9yfq7bw5xcx-mariadb-server-11.8.3-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ldygz3dmi8clh8ixwysapjj77ryxkvm5-mariadb-server-11.8.3"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hxp950mm8yrhdl7bwvv99wmspz0scy5q-mariadb-server-11.8.3",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/vihd7zpy866fymmjsw26ha2rfbqlpsaf-mariadb-server-11.8.3-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hxp950mm8yrhdl7bwvv99wmspz0scy5q-mariadb-server-11.8.3"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/v4pcjck5fd20xinlw40xszyc15c50vp1-mariadb-server-11.8.3",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/msc4q20y4p3msb5ha6mjhsk8hg96h2fz-mariadb-server-11.8.3-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/v4pcjck5fd20xinlw40xszyc15c50vp1-mariadb-server-11.8.3"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/b8a8k2pixzgw81d0p8y5h5ww4nnn15y7-mariadb-server-11.8.3",
+              "default": true
+            },
+            {
+              "name": "man",
+              "path": "/nix/store/lkf2px6020zlv0ppynzk1jnbgd8lhf1a-mariadb-server-11.8.3-man",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/b8a8k2pixzgw81d0p8y5h5ww4nnn15y7-mariadb-server-11.8.3"
         }
       }
     }

@@ -1,10 +1,10 @@
 {
   "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.2/.schema/devbox.schema.json",
-  "packages": ["atlas@0.38.0", "go@1.25.4"],
+  "packages": ["atlas@0.38.0", "go@1.25.4", "mariadb@11.8.3"],
   "shell": {
-    "init_hook": ["docker compose -f compose.dev.yaml up -d"],
+    "init_hook": [],
     "scripts": {
-      "test": ["echo \"Error: no test specified\" && exit 1"]
+      "up:db": ["mysql -u root < setup.sql"]
     }
   }
 }
