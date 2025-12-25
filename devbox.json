@@ -4,7 +4,8 @@
     "atlas@0.38.0",
     "go@1.25.4",
     "mariadb@11.8.3",
-    "sqlfluff@3.5.0"
+    "sqlfluff@3.5.0",
+    "sqlc@1.30.0"
   ],
   "shell": {
     "init_hook": [],
