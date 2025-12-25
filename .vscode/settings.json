@@ -1,0 +1,4 @@
+{
+  "sqlfluff.executablePath": "${workspaceFolder}/.devbox/nix/profile/default/bin/sqlfluff",
+  "sqlfluff.dialect": "mysql"
+}

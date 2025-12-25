@@ -197,6 +197,70 @@
           "store_path": "/nix/store/b8a8k2pixzgw81d0p8y5h5ww4nnn15y7-mariadb-server-11.8.3"
         }
       }
+    },
+    "sqlfluff@3.5.0": {
+      "last_modified": "2025-12-11T04:04:52Z",
+      "resolved": "github:NixOS/nixpkgs/5d6bdbddb4695a62f0d00a3620b37a15275a5093#sqlfluff",
+      "source": "devbox-search",
+      "version": "3.5.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/dlrrbkfbllp11qd3ggxpvn8ijwhc88kz-sqlfluff-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/4jq6pjm9klmx9drc4mbhhi1cgd5wbkyr-sqlfluff-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/dlrrbkfbllp11qd3ggxpvn8ijwhc88kz-sqlfluff-3.5.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/lszlfy09z661vwwh94smc3aqdaicg514-sqlfluff-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/imdf2zxv8iyw0gfj4j1hs9kp1lriq8v7-sqlfluff-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/lszlfy09z661vwwh94smc3aqdaicg514-sqlfluff-3.5.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/sz3lm66ig04fgaai75jka50v02ld4vnv-sqlfluff-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/i7bmjg6k7r5qb3w4h5djlp0spc3bxsxa-sqlfluff-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/sz3lm66ig04fgaai75jka50v02ld4vnv-sqlfluff-3.5.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/5j2diz8af5rahjcsdii95yhkc6wf0fac-sqlfluff-3.5.0",
+              "default": true
+            },
+            {
+              "name": "dist",
+              "path": "/nix/store/vhc8yj44rk6lfmzns2ii170phjnwzpfm-sqlfluff-3.5.0-dist"
+            }
+          ],
+          "store_path": "/nix/store/5j2diz8af5rahjcsdii95yhkc6wf0fac-sqlfluff-3.5.0"
+        }
+      }
     }
   }
 }
