@@ -1,0 +1,9 @@
+version: "2"
+sql:
+  - schema: "internal/infrastructure/mariadb/schema/schema.sql"
+    queries: "internal/infrastructure/mariadb/query/query.sql"
+    engine: "mysql"
+    gen:
+      go:
+        package: "db"
+        out: "internal/infrastructure/mariadb/db"
