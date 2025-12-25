@@ -10,7 +10,8 @@
   "shell": {
     "init_hook": [],
     "scripts": {
-      "up:db": ["mysql -u root < setup.sql"]
+      "setup-db": ["mysql -u root < setup.sql"],
+      "atlas-apply": ["atlas schema apply --env local"]
     }
   }
 }

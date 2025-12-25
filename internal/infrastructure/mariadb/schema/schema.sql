@@ -3,7 +3,7 @@ CREATE TABLE `vm_templates` (
     `vmid` int unsigned NOT NULL,
     `name` varchar(100) NOT NULL,
     PRIMARY KEY (`vmid`)
-) COLLATE utf8mb4_uca1400_ai_ci;
+) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
 -- Create "instances" table
 CREATE TABLE `instances` (
@@ -17,4 +17,4 @@ CREATE TABLE `instances` (
     CONSTRAINT `instances_vm_templates_FK`
     FOREIGN KEY (`template_vmid`) REFERENCES `vm_templates` (`vmid`)
     ON UPDATE CASCADE ON DELETE RESTRICT
-) COLLATE utf8mb4_uca1400_ai_ci;
+) DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
