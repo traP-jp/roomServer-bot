@@ -7,7 +7,38 @@ package db
 
 import (
 	"context"
+	"database/sql"
 )
+
+const createInstance = `-- name: CreateInstance :exec
+INSERT INTO instances (vmid, user_id, template_vmid, ip_address) VALUES (?, ?, ?, ?)
+`
+
+type CreateInstanceParams struct {
+	Vmid         uint32
+	UserID       string
+	TemplateVmid uint32
+	IpAddress    sql.NullString
+}
+
+func (q *Queries) CreateInstance(ctx context.Context, arg CreateInstanceParams) error {
+	_, err := q.db.ExecContext(ctx, createInstance,
+		arg.Vmid,
+		arg.UserID,
+		arg.TemplateVmid,
+		arg.IpAddress,
+	)
+	return err
+}
+
+const deleteInstanceByVMID = `-- name: DeleteInstanceByVMID :exec
+DELETE FROM instances WHERE vmid = ?
+`
+
+func (q *Queries) DeleteInstanceByVMID(ctx context.Context, vmid uint32) error {
+	_, err := q.db.ExecContext(ctx, deleteInstanceByVMID, vmid)
+	return err
+}
 
 const getInstanceByUserID = `-- name: GetInstanceByUserID :many
 SELECT vmid, user_id, template_vmid, ip_address, created_at FROM instances WHERE user_id = ?
@@ -29,6 +60,44 @@ func (q *Queries) GetInstanceByUserID(ctx context.Context, userID string) ([]Ins
 			&i.IpAddress,
 			&i.CreatedAt,
 		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getVMTemplateByVMID = `-- name: GetVMTemplateByVMID :one
+SELECT vmid, name FROM vm_templates WHERE vmid = ?
+`
+
+func (q *Queries) GetVMTemplateByVMID(ctx context.Context, vmid uint32) (VmTemplate, error) {
+	row := q.db.QueryRowContext(ctx, getVMTemplateByVMID, vmid)
+	var i VmTemplate
+	err := row.Scan(&i.Vmid, &i.Name)
+	return i, err
+}
+
+const listVMTemplates = `-- name: ListVMTemplates :many
+SELECT vmid, name FROM vm_templates
+`
+
+func (q *Queries) ListVMTemplates(ctx context.Context) ([]VmTemplate, error) {
+	rows, err := q.db.QueryContext(ctx, listVMTemplates)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []VmTemplate
+	for rows.Next() {
+		var i VmTemplate
+		if err := rows.Scan(&i.Vmid, &i.Name); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
