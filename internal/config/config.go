@@ -18,7 +18,8 @@ type DBConfig struct {
 
 type ProxmoxConfig struct {
 	Endpoint string `env:"PROXMOX_ENDPOINT,notEmpty"`
-	ApiToken string `env:"PROXMOX_API_TOKEN,notEmpty"`
+	TokenID  string `env:"PROXMOX_TOKEN_ID,notEmpty"`
+	Secret   string `env:"PROXMOX_SECRET,notEmpty"`
 }
 
 type TraqConfig struct {
