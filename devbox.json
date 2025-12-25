@@ -11,7 +11,8 @@
     "init_hook": [],
     "scripts": {
       "setup-db": ["mysql -u root < setup.sql"],
-      "atlas-apply": ["atlas schema apply --env local"]
+      "atlas-apply": ["atlas schema apply --env local"],
+      "sqlc-generate": ["sqlc generate"]
     }
   }
 }
