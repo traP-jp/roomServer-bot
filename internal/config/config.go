@@ -20,11 +20,14 @@ type ProxmoxConfig struct {
 	Endpoint string `env:"PROXMOX_ENDPOINT,notEmpty"`
 	TokenID  string `env:"PROXMOX_TOKEN_ID,notEmpty"`
 	Secret   string `env:"PROXMOX_SECRET,notEmpty"`
+	NodeName string `env:"PROXMOX_NODE_NAME,notEmpty"`
+	Insecure bool   `env:"PROXMOX_INSECURE" envDefault:"false"`
 }
 
 type TraqConfig struct {
-	Endpoint string `env:"TRAQ_ENDPOINT,notEmpty"`
-	ApiToken string `env:"TRAQ_API_TOKEN,notEmpty"`
+	Endpoint  string `env:"TRAQ_ENDPOINT,notEmpty"`
+	ApiToken  string `env:"TRAQ_API_TOKEN,notEmpty"`
+	BotUserID string `env:"TRAQ_BOT_USER_ID,notEmpty"`
 }
 
 func LoadConfig() (*Config, error) {
