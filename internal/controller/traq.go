@@ -79,33 +79,52 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 	}
 
 	switch parts[0] {
-	case "/create":
+	case "/create": // VM作成コマンド
+		c.AddReaction(ctx, messageID, c.loadingStampID)
+
+		// バリデーション
 		if len(parts) < 2 {
 			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /create <template_vmid>")
+			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 		id, err := strconv.Atoi(parts[1])
 		if err != nil {
 			_ = c.chatSvc.SendMessage(ctx, channelID, "テンプレートIDは数値で指定してください。")
+			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
+
+		// VM作成処理
 		_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成を開始します...")
 		inst, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
 		if err != nil {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成に失敗しました")
 			slog.Error("Failed to create VM", "error", err)
+			_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成に失敗しました")
+			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM作成完了: VMID=%d, 名前=%s, IP=%s", inst.Vmid, inst.IpAddress, inst.IpAddress))
 
-	case "/ls":
+		// 作成完了メッセージ送信
+		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM作成完了\n\n- VMID: %d\n- IP: %s", inst.Vmid, inst.IpAddress))
+		c.AddReaction(ctx, messageID, c.completedStampID)
+
+	case "/ls": // 一覧表示コマンド
+		c.AddReaction(ctx, messageID, c.loadingStampID)
+
+		// サブコマンドによって処理を分岐
+		// テンプレート一覧表示
 		if len(parts) >= 2 && parts[1] == "template" {
-			c.handleListTemplates(ctx, channelID)
+			c.handleListTemplates(ctx, channelID, messageID)
 			return
 		}
-		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: 不明なサブコマンドです。")
 
-	case "/help":
+		// 不明なサブコマンド
+		slog.Error("Unknown subcommand", "subcommand", parts[1])
+		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: 不明なサブコマンドです。")
+		c.AddReaction(ctx, messageID, c.errorStampID)
+
+	case "/help": // ヘルプコマンド
 		c.AddReaction(ctx, messageID, c.loadingStampID)
 		c.sendHelpMessage(ctx, channelID)
 		c.AddReaction(ctx, messageID, c.completedStampID)
@@ -113,15 +132,18 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 }
 
 // handleListTemplates はテンプレート一覧を取得して送信する
-func (c *TraqController) handleListTemplates(ctx context.Context, channelID string) {
+func (c *TraqController) handleListTemplates(ctx context.Context, channelID string, messageID string) {
 	templates, err := c.vmUsecase.ListTemplates(ctx)
 	if err != nil {
+		slog.Error("Failed to list templates", "error", err)
 		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: テンプレート一覧の取得に失敗しました。")
+		c.AddReaction(ctx, messageID, c.errorStampID)
 		return
 	}
 
 	message := c.vmUsecase.FormatTemplateList(templates)
 	_ = c.chatSvc.SendMessage(ctx, channelID, message)
+	c.AddReaction(ctx, messageID, c.completedStampID)
 }
 
 // sendHelpMessage はヘルプメッセージを送信する
