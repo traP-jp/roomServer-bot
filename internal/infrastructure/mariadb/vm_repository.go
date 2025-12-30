@@ -60,3 +60,11 @@ func (r *vmRepository) GetAllTemplates(ctx context.Context) ([]domain.VmTemplate
 	}
 	return templates, nil
 }
+
+func (r *vmRepository) GetVMTemplateByVMID(ctx context.Context, vmid uint32) (domain.VmTemplate, error) {
+	v, err := r.q.GetVMTemplateByVMID(ctx, vmid)
+	if err != nil {
+		return domain.VmTemplate{}, err
+	}
+	return domain.VmTemplate{Vmid: v.Vmid, Name: v.Name}, nil
+}

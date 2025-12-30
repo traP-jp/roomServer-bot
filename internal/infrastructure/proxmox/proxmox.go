@@ -3,7 +3,9 @@ package proxmox
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/luthermonson/go-proxmox"
 	"github.com/trap-jp/roomserver-bot/internal/domain"
@@ -51,10 +53,10 @@ func (p *ProxmoxService) CloneVM(ctx context.Context, nodeName string, newVmID u
 	// クローン実行
 	_, task, err := template.Clone(ctx, cloneOptions)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to initiate VM clone: %w", err)
 	}
 
-	if err := task.Wait(ctx, 5, 300); err != nil {
+	if err := task.Wait(ctx, 5*time.Second, 300*time.Second); err != nil {
 		return err
 	}
 
@@ -80,7 +82,7 @@ func (p *ProxmoxService) StartVM(ctx context.Context, nodeName string, vmid uint
 		return err
 	}
 
-	if err := task.Wait(ctx, 2, 60); err != nil {
+	if err := task.Wait(ctx, 2*time.Second, 60*time.Second); err != nil {
 		return err
 	}
 
@@ -106,7 +108,7 @@ func (p *ProxmoxService) StopVM(ctx context.Context, nodeName string, vmid uint3
 		return err
 	}
 
-	if err := task.Wait(ctx, 2, 60); err != nil {
+	if err := task.Wait(ctx, 2*time.Second, 60*time.Second); err != nil {
 		return err
 	}
 

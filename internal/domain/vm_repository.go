@@ -11,4 +11,5 @@ type VMRepository interface {
 	SaveInstance(ctx context.Context, inst *Instance) error
 	FindInstancesByUserID(ctx context.Context, userID string) ([]Instance, error)
 	GetAllTemplates(ctx context.Context) ([]VmTemplate, error)
+	GetVMTemplateByVMID(ctx context.Context, vmid uint32) (VmTemplate, error)
 }

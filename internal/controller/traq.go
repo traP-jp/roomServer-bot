@@ -2,7 +2,10 @@ package controller
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
+	"strconv"
+	"strings"
 
 	traqwsbot "github.com/traPtitech/traq-ws-bot"
 	"github.com/traPtitech/traq-ws-bot/payload"
@@ -55,14 +58,43 @@ func (c *TraqController) handleMessage(ctx context.Context, p *payload.MessageCr
 	// メッセージからコマンドを抽出
 	text := p.Message.PlainText
 	// コマンドに応じて処理を実行
-	c.executeCommand(ctx, text, p.Message.ChannelID)
+	c.executeCommand(ctx, text, p.Message.ChannelID, p.Message.User.ID)
 }
 
 // executeCommand はコマンドを実行する
-func (c *TraqController) executeCommand(ctx context.Context, command string, channelID string) {
-	switch command {
-	case "/ls template":
-		c.handleListTemplates(ctx, channelID)
+func (c *TraqController) executeCommand(ctx context.Context, command string, channelID string, userID string) {
+	cmd := strings.TrimSpace(command)
+	parts := strings.Fields(cmd)
+	if len(parts) == 0 {
+		return
+	}
+
+	switch parts[0] {
+	case "/create":
+		if len(parts) < 2 {
+			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /create <template_vmid>")
+			return
+		}
+		id, err := strconv.Atoi(parts[1])
+		if err != nil {
+			_ = c.chatSvc.SendMessage(ctx, channelID, "テンプレートIDは数値で指定してください。")
+			return
+		}
+		_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成を開始します...")
+		inst, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
+		if err != nil {
+			_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM作成に失敗しました: %v", err))
+			return
+		}
+		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM作成完了: VMID=%d, 名前=%s, IP=%s", inst.Vmid, inst.IpAddress, inst.IpAddress))
+
+	case "/ls":
+		if len(parts) >= 2 && parts[1] == "template" {
+			c.handleListTemplates(ctx, channelID)
+			return
+		}
+		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: 不明なサブコマンドです。")
+
 	case "/help":
 		c.sendHelpMessage(ctx, channelID)
 	}

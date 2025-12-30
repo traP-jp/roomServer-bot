@@ -63,7 +63,7 @@ func main() {
 	}
 
 	// Usecaseの初期化
-	vmUsecase := usecase.NewVMProvisioningUsecase(vmRepo, proxmoxSvc, chatSvc)
+	vmUsecase := usecase.NewVMProvisioningUsecase(vmRepo, proxmoxSvc, chatSvc, cfg.Proxmox.NodeName)
 
 	// Controllerの初期化
 	traqController := controller.NewTraqController(
