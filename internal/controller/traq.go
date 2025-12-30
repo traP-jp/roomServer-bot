@@ -85,7 +85,7 @@ func (c *TraqController) sendHelpMessage(ctx context.Context, channelID string) 
 	helpMessage := "## 部室サーバー管理bot\n\n" +
 		"- `/ls template` - 利用可能なテンプレートの一覧を表示\n" +
 		"- `/ls vm` - 自分のVMの一覧を表示\n" +
-		"- `/create <template_name>` - 指定したテンプレートから新しいVMを作成\n" +
+		"- `/create <template_vmid>` - 指定したテンプレートから新しいVMを作成\n" +
 		"- `/start <vmid>` - 指定したVMを起動\n" +
 		"- `/stop <vmid>` - 指定したVMを停止\n"
 

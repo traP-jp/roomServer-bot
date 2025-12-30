@@ -42,10 +42,10 @@ func (u *VMProvisioningUsecase) FormatTemplateList(templates []domain.VmTemplate
 	}
 
 	var builder strings.Builder
-	builder.WriteString("**利用可能なテンプレート一覧:**\n\n")
+	builder.WriteString("利用可能なテンプレート\n\n")
 
 	for _, template := range templates {
-		builder.WriteString(fmt.Sprintf("- `%s` (VMID: %d)\n", template.Name, template.Vmid))
+		builder.WriteString(fmt.Sprintf("- %d: `%s`\n", template.Vmid, template.Name))
 	}
 
 	return builder.String()
