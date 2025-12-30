@@ -80,18 +80,18 @@ func (u *VMProvisioningUsecase) FormatVMList(ctx context.Context, instances []do
 			templateName = tpl.Name
 		}
 
-		builder.WriteString(fmt.Sprintf("- VMID: %d (テンプレート: `%s`)\n  IP: %s\n", inst.Vmid, templateName, inst.IpAddress))
+		builder.WriteString(fmt.Sprintf("- VMID: %d (テンプレート: `%s`)\n", inst.Vmid, templateName))
 	}
 
 	return builder.String()
 }
 
 // CreateVM は指定されたテンプレートIDからVMをクローンし、DBに保存する
-func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, templateVmid uint32) (domain.Instance, error) {
+func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, templateVmid uint32) (domain.Instance, string, error) {
 	// テンプレートをDBから直接取得
 	tpl, err := u.vmRepo.GetVMTemplateByVMID(ctx, templateVmid)
 	if err != nil {
-		return domain.Instance{}, fmt.Errorf("template %d not found: %w", templateVmid, err)
+		return domain.Instance{}, "", fmt.Errorf("template %d not found: %w", templateVmid, err)
 	}
 
 	// 新しいVMIDを時刻から生成
@@ -106,12 +106,12 @@ func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, tem
 
 	// クローン実行
 	if err := u.proxmox.CloneVM(ctx, u.nodeName, newVmID, newName, templateVmid); err != nil {
-		return domain.Instance{}, fmt.Errorf("failed to clone vm: %w", err)
+		return domain.Instance{}, "", fmt.Errorf("failed to clone vm: %w", err)
 	}
 
 	// 起動
 	if err := u.proxmox.StartVM(ctx, u.nodeName, newVmID); err != nil {
-		return domain.Instance{}, fmt.Errorf("failed to start vm: %w", err)
+		return domain.Instance{}, "", fmt.Errorf("failed to start vm: %w", err)
 	}
 
 	// IPアドレス取得
@@ -128,21 +128,20 @@ func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, tem
 		time.Sleep(retryInterval)
 	}
 	if ip == "" {
-		return domain.Instance{}, fmt.Errorf("failed to get ip address after %d retries: %w", maxRetries, err)
+		return domain.Instance{}, "", fmt.Errorf("failed to get ip address after %d retries: %w", maxRetries, err)
 	}
 
 	inst := domain.Instance{
 		Vmid:         newVmID,
 		UserID:       userID,
 		TemplateVmid: templateVmid,
-		IpAddress:    ip,
 	}
 
 	if err := u.vmRepo.SaveInstance(ctx, &inst); err != nil {
-		return domain.Instance{}, fmt.Errorf("failed to save instance: %w", err)
+		return domain.Instance{}, "", fmt.Errorf("failed to save instance: %w", err)
 	}
 
-	return inst, nil
+	return inst, ip, nil
 }
 
 // StartVM は指定されたVMIDのVMを起動する（所有者チェック付き）

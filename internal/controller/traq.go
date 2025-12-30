@@ -97,7 +97,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 		// VM作成処理
 		_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成を開始します...")
-		inst, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
+		inst, ipAddress, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
 		if err != nil {
 			slog.Error("Failed to create VM", "error", err)
 			_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成に失敗しました")
@@ -106,7 +106,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		}
 
 		// 作成完了メッセージ送信
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM作成完了\n\n- VMID: %d\n- IP: %s", inst.Vmid, inst.IpAddress))
+		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM作成完了\n\n- VMID: %d\n- IP: %s", inst.Vmid, ipAddress))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
 	case "/ls": // 一覧表示コマンド
