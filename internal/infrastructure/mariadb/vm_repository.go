@@ -25,7 +25,6 @@ func (r *vmRepository) SaveInstance(ctx context.Context, inst *domain.Instance) 
 		Vmid:         inst.Vmid,
 		UserID:       inst.UserID,
 		TemplateVmid: inst.TemplateVmid,
-		IpAddress:    sql.NullString{String: inst.IpAddress, Valid: inst.IpAddress != ""},
 	})
 }
 
@@ -40,7 +39,6 @@ func (r *vmRepository) FindInstancesByUserID(ctx context.Context, userID string)
 			Vmid:         i.Vmid,
 			UserID:       i.UserID,
 			TemplateVmid: i.TemplateVmid,
-			IpAddress:    i.IpAddress.String,
 		})
 	}
 	return instances, nil

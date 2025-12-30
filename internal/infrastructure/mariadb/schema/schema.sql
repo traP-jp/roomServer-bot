@@ -10,7 +10,6 @@ CREATE TABLE `instances` (
     `vmid` int unsigned NOT NULL,
     `user_id` varchar(100) NOT NULL,
     `template_vmid` int unsigned NOT NULL,
-    `ip_address` varchar(45) NULL,
     `created_at` TIMESTAMP NULL DEFAULT (current_timestamp()),
     PRIMARY KEY (`vmid`),
     INDEX `instances_vm_templates_FK` (`template_vmid`),

@@ -2,7 +2,7 @@
 SELECT * FROM instances WHERE user_id = ?;
 
 -- name: CreateInstance :exec
-INSERT INTO instances (vmid, user_id, template_vmid, ip_address) VALUES (?, ?, ?, ?);
+INSERT INTO instances (vmid, user_id, template_vmid) VALUES (?, ?, ?);
 
 -- name: DeleteInstanceByVMID :exec
 DELETE FROM instances WHERE vmid = ?;

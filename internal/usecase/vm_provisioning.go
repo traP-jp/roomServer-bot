@@ -55,6 +55,37 @@ func (u *VMProvisioningUsecase) FormatTemplateList(templates []domain.VmTemplate
 	return builder.String()
 }
 
+// ListVMsByUser は指定されたユーザーのVM一覧を取得して返す
+func (u *VMProvisioningUsecase) ListVMsByUser(ctx context.Context, userID string) ([]domain.Instance, error) {
+	instances, err := u.vmRepo.FindInstancesByUserID(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get instances: %w", err)
+	}
+	return instances, nil
+}
+
+// FormatVMList はVM一覧を整形されたメッセージに変換する
+func (u *VMProvisioningUsecase) FormatVMList(ctx context.Context, instances []domain.Instance) string {
+	if len(instances) == 0 {
+		return "VMを所有していません。"
+	}
+
+	var builder strings.Builder
+	builder.WriteString("所有VM一覧\n\n")
+
+	for _, inst := range instances {
+		// テンプレート名を取得
+		templateName := fmt.Sprintf("%d", inst.TemplateVmid)
+		if tpl, err := u.vmRepo.GetVMTemplateByVMID(ctx, inst.TemplateVmid); err == nil {
+			templateName = tpl.Name
+		}
+
+		builder.WriteString(fmt.Sprintf("- VMID: %d (テンプレート: `%s`)\n  IP: %s\n", inst.Vmid, templateName, inst.IpAddress))
+	}
+
+	return builder.String()
+}
+
 // CreateVM は指定されたテンプレートIDからVMをクローンし、DBに保存する
 func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, templateVmid uint32) (domain.Instance, error) {
 	// テンプレートをDBから直接取得
@@ -112,4 +143,60 @@ func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, tem
 	}
 
 	return inst, nil
+}
+
+// StartVM は指定されたVMIDのVMを起動する（所有者チェック付き）
+func (u *VMProvisioningUsecase) StartVM(ctx context.Context, userID string, vmid uint32) error {
+	// VMの所有者を確認
+	instances, err := u.vmRepo.FindInstancesByUserID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get instances: %w", err)
+	}
+
+	owned := false
+	for _, inst := range instances {
+		if inst.Vmid == vmid {
+			owned = true
+			break
+		}
+	}
+
+	if !owned {
+		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+	}
+
+	// VM起動
+	if err := u.proxmox.StartVM(ctx, u.nodeName, vmid); err != nil {
+		return fmt.Errorf("failed to start vm: %w", err)
+	}
+
+	return nil
+}
+
+// StopVM は指定されたVMIDのVMを停止する（所有者チェック付き）
+func (u *VMProvisioningUsecase) StopVM(ctx context.Context, userID string, vmid uint32) error {
+	// VMの所有者を確認
+	instances, err := u.vmRepo.FindInstancesByUserID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get instances: %w", err)
+	}
+
+	owned := false
+	for _, inst := range instances {
+		if inst.Vmid == vmid {
+			owned = true
+			break
+		}
+	}
+
+	if !owned {
+		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+	}
+
+	// VM停止
+	if err := u.proxmox.StopVM(ctx, u.nodeName, vmid); err != nil {
+		return fmt.Errorf("failed to stop vm: %w", err)
+	}
+
+	return nil
 }

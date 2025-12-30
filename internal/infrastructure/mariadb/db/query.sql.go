@@ -7,27 +7,20 @@ package db
 
 import (
 	"context"
-	"database/sql"
 )
 
 const createInstance = `-- name: CreateInstance :exec
-INSERT INTO instances (vmid, user_id, template_vmid, ip_address) VALUES (?, ?, ?, ?)
+INSERT INTO instances (vmid, user_id, template_vmid) VALUES (?, ?, ?)
 `
 
 type CreateInstanceParams struct {
 	Vmid         uint32
 	UserID       string
 	TemplateVmid uint32
-	IpAddress    sql.NullString
 }
 
 func (q *Queries) CreateInstance(ctx context.Context, arg CreateInstanceParams) error {
-	_, err := q.db.ExecContext(ctx, createInstance,
-		arg.Vmid,
-		arg.UserID,
-		arg.TemplateVmid,
-		arg.IpAddress,
-	)
+	_, err := q.db.ExecContext(ctx, createInstance, arg.Vmid, arg.UserID, arg.TemplateVmid)
 	return err
 }
 
@@ -41,7 +34,7 @@ func (q *Queries) DeleteInstanceByVMID(ctx context.Context, vmid uint32) error {
 }
 
 const getInstanceByUserID = `-- name: GetInstanceByUserID :many
-SELECT vmid, user_id, template_vmid, ip_address, created_at FROM instances WHERE user_id = ?
+SELECT vmid, user_id, template_vmid, created_at FROM instances WHERE user_id = ?
 `
 
 func (q *Queries) GetInstanceByUserID(ctx context.Context, userID string) ([]Instance, error) {
@@ -57,7 +50,6 @@ func (q *Queries) GetInstanceByUserID(ctx context.Context, userID string) ([]Ins
 			&i.Vmid,
 			&i.UserID,
 			&i.TemplateVmid,
-			&i.IpAddress,
 			&i.CreatedAt,
 		); err != nil {
 			return nil, err
