@@ -145,11 +145,11 @@ func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, tem
 }
 
 // StartVM は指定されたVMIDのVMを起動する（所有者チェック付き）
-func (u *VMProvisioningUsecase) StartVM(ctx context.Context, userID string, vmid uint32) error {
+func (u *VMProvisioningUsecase) StartVM(ctx context.Context, userID string, vmid uint32) (string, error) {
 	// VMの所有者を確認
 	instances, err := u.vmRepo.FindInstancesByUserID(ctx, userID)
 	if err != nil {
-		return fmt.Errorf("failed to get instances: %w", err)
+		return "", fmt.Errorf("failed to get instances: %w", err)
 	}
 
 	owned := false
@@ -161,15 +161,32 @@ func (u *VMProvisioningUsecase) StartVM(ctx context.Context, userID string, vmid
 	}
 
 	if !owned {
-		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+		return "", fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
 	}
 
 	// VM起動
 	if err := u.proxmox.StartVM(ctx, u.nodeName, vmid); err != nil {
-		return fmt.Errorf("failed to start vm: %w", err)
+		return "", fmt.Errorf("failed to start vm: %w", err)
 	}
 
-	return nil
+	// IPアドレス取得
+	// QEMU Guest Agentが起動するまで待機
+	var ip string
+	const maxRetries = 36
+	const retryInterval = 5 * time.Second
+
+	for range maxRetries {
+		ip, err = u.proxmox.GetIPAddress(ctx, u.nodeName, vmid)
+		if err == nil && ip != "" {
+			break
+		}
+		time.Sleep(retryInterval)
+	}
+	if ip == "" {
+		return "", fmt.Errorf("failed to get ip address after %d retries: %w", maxRetries, err)
+	}
+
+	return ip, nil
 }
 
 // StopVM は指定されたVMIDのVMを停止する（所有者チェック付き）

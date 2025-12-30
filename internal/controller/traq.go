@@ -150,7 +150,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		}
 
 		// VM起動処理
-		err = c.vmUsecase.StartVM(ctx, userID, uint32(vmid))
+		ip, err := c.vmUsecase.StartVM(ctx, userID, uint32(vmid))
 		if err != nil {
 			slog.Error("Failed to start VM", "error", err, "vmid", vmid)
 			_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM起動に失敗しました: %v", err))
@@ -158,7 +158,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 			return
 		}
 
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を起動しました", vmid))
+		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を起動しました。\nIP: %s", vmid, ip))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
 	case "/stop": // VM停止コマンド
