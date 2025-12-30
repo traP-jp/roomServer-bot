@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -22,13 +22,15 @@ func main() {
 	// 設定の読み込み
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		log.Fatalf("Failed to load config: %v", err)
+		slog.Error("Failed to load config", "error", err)
+		os.Exit(1)
 	}
 
 	// データベース接続
 	db, err := setupDatabase(cfg.DB)
 	if err != nil {
-		log.Fatalf("Failed to setup database: %v", err)
+		slog.Error("Failed to setup database", "error", err)
+		os.Exit(1)
 	}
 	defer db.Close()
 
@@ -49,13 +51,15 @@ func main() {
 		Origin:      cfg.Traq.Endpoint,
 	})
 	if err != nil {
-		log.Fatalf("Failed to create traq bot: %v", err)
+		slog.Error("Failed to create traQ bot", "error", err)
+		os.Exit(1)
 	}
 
 	// traQサービスの初期化
 	chatSvc, err := traq.NewTraqService(cfg.Traq.ApiToken, cfg.Traq.Endpoint)
 	if err != nil {
-		log.Fatalf("Failed to create traq service: %v", err)
+		slog.Error("Failed to create traQ service", "error", err)
+		os.Exit(1)
 	}
 
 	// Usecaseの初期化
@@ -70,10 +74,11 @@ func main() {
 	)
 
 	// ボットの起動
-	log.Println("Starting roomServer bot...")
+	slog.Info("Starting bot...")
 	go func() {
 		if err := traqController.Start(); err != nil {
-			log.Fatalf("Failed to start bot: %v", err)
+			slog.Error("Failed to start traQ controller", "error", err)
+			os.Exit(1)
 		}
 	}()
 
@@ -82,7 +87,7 @@ func main() {
 	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
 	<-sigCh
 
-	log.Println("Shutting down...")
+	slog.Info("Shutting down...")
 }
 
 // setupDatabase はデータベース接続を設定する
@@ -105,6 +110,6 @@ func setupDatabase(cfg config.DBConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
-	log.Println("Database connection established")
+	slog.Info("Database connection established")
 	return db, nil
 }
