@@ -7,7 +7,7 @@ import (
 	traqwsbot "github.com/traPtitech/traq-ws-bot"
 	"github.com/traPtitech/traq-ws-bot/payload"
 	"github.com/trap-jp/roomserver-bot/internal/domain"
-	usecase "github.com/trap-jp/roomserver-bot/internal/usecases"
+	"github.com/trap-jp/roomserver-bot/internal/usecase"
 )
 
 type TraqController struct {

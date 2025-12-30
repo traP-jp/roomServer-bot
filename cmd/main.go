@@ -15,7 +15,7 @@ import (
 	"github.com/trap-jp/roomserver-bot/internal/infrastructure/mariadb"
 	"github.com/trap-jp/roomserver-bot/internal/infrastructure/proxmox"
 	"github.com/trap-jp/roomserver-bot/internal/infrastructure/traq"
-	usecase "github.com/trap-jp/roomserver-bot/internal/usecases"
+	"github.com/trap-jp/roomserver-bot/internal/usecase"
 )
 
 func main() {
