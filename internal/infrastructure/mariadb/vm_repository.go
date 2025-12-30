@@ -44,6 +44,10 @@ func (r *vmRepository) FindInstancesByUserID(ctx context.Context, userID string)
 	return instances, nil
 }
 
+func (r *vmRepository) DeleteInstance(ctx context.Context, vmid uint32) error {
+	return r.q.DeleteInstanceByVMID(ctx, vmid)
+}
+
 func (r *vmRepository) GetAllTemplates(ctx context.Context) ([]domain.VmTemplate, error) {
 	templatesDB, err := r.q.ListVMTemplates(ctx)
 	if err != nil {

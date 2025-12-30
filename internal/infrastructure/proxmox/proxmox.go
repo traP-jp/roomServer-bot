@@ -115,6 +115,32 @@ func (p *ProxmoxService) StopVM(ctx context.Context, nodeName string, vmid uint3
 	return nil
 }
 
+func (p *ProxmoxService) DeleteVM(ctx context.Context, nodeName string, vmid uint32) error {
+	// ノード取得
+	node, err := p.client.Node(ctx, nodeName)
+	if err != nil {
+		return err
+	}
+
+	// 仮想マシン取得
+	vm, err := node.VirtualMachine(ctx, int(vmid))
+	if err != nil {
+		return err
+	}
+
+	// 仮想マシン削除
+	task, err := vm.Delete(ctx)
+	if err != nil {
+		return err
+	}
+
+	if err := task.Wait(ctx, 2*time.Second, 60*time.Second); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (p *ProxmoxService) GetIPAddress(ctx context.Context, nodeName string, vmid uint32) (string, error) {
 	// ノード取得
 	node, err := p.client.Node(ctx, nodeName)

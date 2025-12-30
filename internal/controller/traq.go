@@ -188,6 +188,34 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		_, _ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を停止しました。", vmid))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
+	case "/delete": // VM削除コマンド
+		c.AddReaction(ctx, messageID, c.loadingStampID)
+
+		// バリデーション
+		if len(parts) < 2 {
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 使い方: /delete <vmid>")
+			c.AddReaction(ctx, messageID, c.errorStampID)
+			return
+		}
+		vmid, err := strconv.Atoi(parts[1])
+		if err != nil {
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VMIDは数値で指定してください。")
+			c.AddReaction(ctx, messageID, c.errorStampID)
+			return
+		}
+
+		// VM削除処理
+		err = c.vmUsecase.DeleteVM(ctx, userID, uint32(vmid))
+		if err != nil {
+			slog.Error("Failed to delete VM", "error", err, "vmid", vmid)
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM削除に失敗しました。\nVMIDが正しいか、またVMが停止しているか確認してください。")
+			c.AddReaction(ctx, messageID, c.errorStampID)
+			return
+		}
+
+		_, _ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を削除しました。", vmid))
+		c.AddReaction(ctx, messageID, c.completedStampID)
+
 	case "/help": // ヘルプコマンド
 		c.AddReaction(ctx, messageID, c.loadingStampID)
 		c.sendHelpMessage(ctx, channelID)
@@ -231,6 +259,7 @@ func (c *TraqController) sendHelpMessage(ctx context.Context, channelID string) 
 		"- `/ls template` - 利用可能なテンプレートの一覧を表示\n" +
 		"- `/ls vm` - 自分のVMの一覧を表示\n" +
 		"- `/create <template_vmid>` - 指定したテンプレートから新しいVMを作成\n" +
+		"- `/delete <vmid>` - 指定したVMを削除\n" +
 		"- `/start <vmid>` - 指定したVMを起動\n" +
 		"- `/stop <vmid>` - 指定したVMを停止\n"
 

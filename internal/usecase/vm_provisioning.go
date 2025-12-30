@@ -216,3 +216,36 @@ func (u *VMProvisioningUsecase) StopVM(ctx context.Context, userID string, vmid 
 
 	return nil
 }
+
+// DeleteVM は指定されたVMIDのVMを削除する（所有者チェック付き）
+func (u *VMProvisioningUsecase) DeleteVM(ctx context.Context, userID string, vmid uint32) error {
+	// VMの所有者を確認
+	instances, err := u.vmRepo.FindInstancesByUserID(ctx, userID)
+	if err != nil {
+		return fmt.Errorf("failed to get instances: %w", err)
+	}
+
+	owned := false
+	for _, inst := range instances {
+		if inst.Vmid == vmid {
+			owned = true
+			break
+		}
+	}
+
+	if !owned {
+		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+	}
+
+	// Proxmox上でVM削除
+	if err := u.proxmox.DeleteVM(ctx, u.nodeName, vmid); err != nil {
+		return fmt.Errorf("failed to delete vm: %w", err)
+	}
+
+	// DB上のインスタンス情報を削除
+	if err := u.vmRepo.DeleteInstance(ctx, vmid); err != nil {
+		return fmt.Errorf("failed to delete instance from db: %w", err)
+	}
+
+	return nil
+}
