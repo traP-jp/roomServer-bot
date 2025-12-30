@@ -84,29 +84,29 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 		// バリデーション
 		if len(parts) < 2 {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /create <template_vmid>")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 使い方: /create <template_vmid>")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 		id, err := strconv.Atoi(parts[1])
 		if err != nil {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "テンプレートIDは数値で指定してください。")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: テンプレートIDは数値で指定してください。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 
 		// VM作成処理
-		_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成を開始します...")
+		botMessageID, _ := c.chatSvc.SendMessage(ctx, channelID, ":arrows_counterclockwise: VMを作成しています...")
 		inst, ipAddress, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
 		if err != nil {
 			slog.Error("Failed to create VM", "error", err)
-			_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成に失敗しました")
+			_ = c.chatSvc.EditMessage(ctx, messageID, ":exclamation: VM作成に失敗しました。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 
 		// 作成完了メッセージ送信
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM作成完了\n\n- VMID: %d\n- IP: %s", inst.Vmid, ipAddress))
+		_ = c.chatSvc.EditMessage(ctx, botMessageID, fmt.Sprintf(":white_check_mark: VM作成完了\n\n- VMID: %d\n- IP: `%s`", inst.Vmid, ipAddress))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
 	case "/ls": // 一覧表示コマンド
@@ -114,7 +114,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 		// サブコマンドによって処理を分岐
 		if len(parts) < 2 {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /ls <template|vm>")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 使い方: /ls <template|vm>")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
@@ -128,8 +128,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 			c.handleListVMs(ctx, channelID, messageID, userID)
 		default:
 			// 不明なサブコマンド
-			slog.Error("Unknown subcommand", "subcommand", parts[1])
-			_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: 不明なサブコマンドです。\n使い方: /ls <template|vm>")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 不明なサブコマンドです。\n使い方: /ls <template|vm>")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 		}
 
@@ -138,13 +137,13 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 		// バリデーション
 		if len(parts) < 2 {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /start <vmid>")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 使い方: /start <vmid>")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 		vmid, err := strconv.Atoi(parts[1])
 		if err != nil {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "VMIDは数値で指定してください。")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VMIDは数値で指定してください。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
@@ -153,12 +152,12 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		ip, err := c.vmUsecase.StartVM(ctx, userID, uint32(vmid))
 		if err != nil {
 			slog.Error("Failed to start VM", "error", err, "vmid", vmid)
-			_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM起動に失敗しました: %v", err))
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM起動に失敗しました。\nVMIDが正しいか確認してください。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を起動しました。\nIP: %s", vmid, ip))
+		_, _ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を起動しました。\nIP: `%s`", vmid, ip))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
 	case "/stop": // VM停止コマンド
@@ -166,13 +165,13 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 		// バリデーション
 		if len(parts) < 2 {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "使い方: /stop <vmid>")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: 使い方: /stop <vmid>")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 		vmid, err := strconv.Atoi(parts[1])
 		if err != nil {
-			_ = c.chatSvc.SendMessage(ctx, channelID, "VMIDは数値で指定してください。")
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VMIDは数値で指定してください。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
@@ -181,12 +180,12 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		err = c.vmUsecase.StopVM(ctx, userID, uint32(vmid))
 		if err != nil {
 			slog.Error("Failed to stop VM", "error", err, "vmid", vmid)
-			_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM停止に失敗しました: %v", err))
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM停止に失敗しました。\nVMIDが正しいか確認してください。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
 
-		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を停止しました", vmid))
+		_, _ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf(":white_check_mark: VM %d を停止しました。", vmid))
 		c.AddReaction(ctx, messageID, c.completedStampID)
 
 	case "/help": // ヘルプコマンド
@@ -201,13 +200,13 @@ func (c *TraqController) handleListTemplates(ctx context.Context, channelID stri
 	templates, err := c.vmUsecase.ListTemplates(ctx)
 	if err != nil {
 		slog.Error("Failed to list templates", "error", err)
-		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: テンプレート一覧の取得に失敗しました。")
+		_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: テンプレート一覧の取得に失敗しました。")
 		c.AddReaction(ctx, messageID, c.errorStampID)
 		return
 	}
 
 	message := c.vmUsecase.FormatTemplateList(templates)
-	_ = c.chatSvc.SendMessage(ctx, channelID, message)
+	_, _ = c.chatSvc.SendMessage(ctx, channelID, message)
 	c.AddReaction(ctx, messageID, c.completedStampID)
 }
 
@@ -216,13 +215,13 @@ func (c *TraqController) handleListVMs(ctx context.Context, channelID string, me
 	instances, err := c.vmUsecase.ListVMsByUser(ctx, userID)
 	if err != nil {
 		slog.Error("Failed to list VMs", "error", err, "userID", userID)
-		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: VM一覧の取得に失敗しました。")
+		_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM一覧の取得に失敗しました。")
 		c.AddReaction(ctx, messageID, c.errorStampID)
 		return
 	}
 
 	message := c.vmUsecase.FormatVMList(ctx, instances)
-	_ = c.chatSvc.SendMessage(ctx, channelID, message)
+	_, _ = c.chatSvc.SendMessage(ctx, channelID, message)
 	c.AddReaction(ctx, messageID, c.completedStampID)
 }
 
@@ -235,7 +234,7 @@ func (c *TraqController) sendHelpMessage(ctx context.Context, channelID string) 
 		"- `/start <vmid>` - 指定したVMを起動\n" +
 		"- `/stop <vmid>` - 指定したVMを停止\n"
 
-	_ = c.chatSvc.SendMessage(ctx, channelID, helpMessage)
+	_, _ = c.chatSvc.SendMessage(ctx, channelID, helpMessage)
 }
 
 func (c *TraqController) AddReaction(ctx context.Context, messageID string, emoji string) error {
