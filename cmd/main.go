@@ -69,6 +69,9 @@ func main() {
 	traqController := controller.NewTraqController(
 		bot,
 		cfg.Traq.BotUserID,
+		cfg.Traq.LoadingStampID,
+		cfg.Traq.CompletedStampID,
+		cfg.Traq.ErrorStampID,
 		chatSvc,
 		vmUsecase,
 	)

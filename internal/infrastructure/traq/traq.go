@@ -42,3 +42,8 @@ func (t *TraqService) EditMessage(ctx context.Context, messageID string, newCont
 		Execute()
 	return err
 }
+
+func (t *TraqService) AddReaction(ctx context.Context, messageID string, emoji string) error {
+	_, err := t.bot.API().MessageApi.AddMessageStamp(ctx, messageID, emoji).Execute()
+	return err
+}

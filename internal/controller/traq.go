@@ -14,23 +14,32 @@ import (
 )
 
 type TraqController struct {
-	bot       *traqwsbot.Bot
-	botUserID string
-	chatSvc   domain.ChatService
-	vmUsecase *usecase.VMProvisioningUsecase
+	bot              *traqwsbot.Bot
+	botUserID        string
+	loadingStampID   string
+	completedStampID string
+	errorStampID     string
+	chatSvc          domain.ChatService
+	vmUsecase        *usecase.VMProvisioningUsecase
 }
 
 func NewTraqController(
 	bot *traqwsbot.Bot,
 	botUserID string,
+	loadingStampID string,
+	completedStampID string,
+	errorStampID string,
 	chatSvc domain.ChatService,
 	vmUsecase *usecase.VMProvisioningUsecase,
 ) *TraqController {
 	return &TraqController{
-		bot:       bot,
-		botUserID: botUserID,
-		chatSvc:   chatSvc,
-		vmUsecase: vmUsecase,
+		bot:              bot,
+		botUserID:        botUserID,
+		loadingStampID:   loadingStampID,
+		completedStampID: completedStampID,
+		errorStampID:     errorStampID,
+		chatSvc:          chatSvc,
+		vmUsecase:        vmUsecase,
 	}
 }
 
@@ -58,11 +67,11 @@ func (c *TraqController) handleMessage(ctx context.Context, p *payload.MessageCr
 	// メッセージからコマンドを抽出
 	text := p.Message.PlainText
 	// コマンドに応じて処理を実行
-	c.executeCommand(ctx, text, p.Message.ChannelID, p.Message.User.ID)
+	c.executeCommand(ctx, text, p.Message.ID, p.Message.ChannelID, p.Message.User.ID)
 }
 
 // executeCommand はコマンドを実行する
-func (c *TraqController) executeCommand(ctx context.Context, command string, channelID string, userID string) {
+func (c *TraqController) executeCommand(ctx context.Context, command string, messageID string, channelID string, userID string) {
 	cmd := strings.TrimSpace(command)
 	parts := strings.Fields(cmd)
 	if len(parts) == 0 {
@@ -83,7 +92,8 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, cha
 		_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成を開始します...")
 		inst, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
 		if err != nil {
-			_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM作成に失敗しました: %v", err))
+			_ = c.chatSvc.SendMessage(ctx, channelID, "VM作成に失敗しました")
+			slog.Error("Failed to create VM", "error", err)
 			return
 		}
 		_ = c.chatSvc.SendMessage(ctx, channelID, fmt.Sprintf("VM作成完了: VMID=%d, 名前=%s, IP=%s", inst.Vmid, inst.IpAddress, inst.IpAddress))
@@ -96,7 +106,9 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, cha
 		_ = c.chatSvc.SendMessage(ctx, channelID, "エラー: 不明なサブコマンドです。")
 
 	case "/help":
+		c.AddReaction(ctx, messageID, c.loadingStampID)
 		c.sendHelpMessage(ctx, channelID)
+		c.AddReaction(ctx, messageID, c.completedStampID)
 	}
 }
 
@@ -122,4 +134,12 @@ func (c *TraqController) sendHelpMessage(ctx context.Context, channelID string) 
 		"- `/stop <vmid>` - 指定したVMを停止\n"
 
 	_ = c.chatSvc.SendMessage(ctx, channelID, helpMessage)
+}
+
+func (c *TraqController) AddReaction(ctx context.Context, messageID string, emoji string) error {
+	err := c.chatSvc.AddReaction(ctx, messageID, emoji)
+	if err != nil {
+		slog.Error("Failed to add reaction", "error", err)
+	}
+	return err
 }

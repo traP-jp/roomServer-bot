@@ -25,9 +25,12 @@ type ProxmoxConfig struct {
 }
 
 type TraqConfig struct {
-	Endpoint  string `env:"TRAQ_ENDPOINT,notEmpty"`
-	ApiToken  string `env:"TRAQ_API_TOKEN,notEmpty"`
-	BotUserID string `env:"TRAQ_BOT_USER_ID,notEmpty"`
+	Endpoint         string `env:"TRAQ_ENDPOINT,notEmpty"`
+	ApiToken         string `env:"TRAQ_API_TOKEN,notEmpty"`
+	BotUserID        string `env:"TRAQ_BOT_USER_ID,notEmpty"`
+	LoadingStampID   string `env:"TRAQ_STAMP_ID_LOADING,notEmpty"`
+	CompletedStampID string `env:"TRAQ_STAMP_ID_COMPLETED,notEmpty"`
+	ErrorStampID     string `env:"TRAQ_STAMP_ID_ERROR,notEmpty"`
 }
 
 func LoadConfig() (*Config, error) {
