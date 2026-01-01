@@ -10,7 +10,7 @@
   "shell": {
     "init_hook": [],
     "scripts": {
-      "setup-db": ["mysql -u root < setup.sql"],
+      "setup-db": ["mysql -u root < scripts/setup.sql"],
       "atlas-apply": ["atlas schema apply --env local"],
       "sqlc-generate": ["sqlc generate"]
     }
