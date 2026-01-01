@@ -18,14 +18,12 @@ atlas migrate apply \
   --url "${DB_URL}" \
   --dir "file:///app/migrations"
 
-# proxychainsの設定ファイルを作成
-cat <<EOT > /etc/proxychains.conf
-strict_chain
-proxy_dns
-remote_dns_resolv_conf
-[ProxyList]
-socks5 127.0.0.1 1055
-EOT
+# プロキシ設定
+export ALL_PROXY=socks5://localhost:1055/
+export HTTP_PROXY=http://localhost:1055/
+export http_proxy=http://localhost:1055/
+export HTTPS_PROXY=http://localhost:1055/
+export https_proxy=http://localhost:1055/
 
 # アプリケーション起動
-exec proxychains4 -f /etc/proxychains.conf "$@"
+exec "$@"
