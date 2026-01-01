@@ -23,11 +23,5 @@ export ALL_PROXY=socks5://localhost:1055/
 export HTTP_PROXY=http://localhost:1055/
 export http_proxy=http://localhost:1055/
 
-# proxychain設定
-echo "strict_chain" > /etc/proxychains.conf
-echo "proxy_dns" >> /etc/proxychains.conf
-echo "[ProxyList]" >> /etc/proxychains.conf
-echo "socks5 127.0.0.1 1055" >> /etc/proxychains.conf
-
 # アプリケーション起動
-exec proxychains4 -f /etc/proxychains.conf "$@"
+exec "$@"
