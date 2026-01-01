@@ -9,7 +9,7 @@ tailscaled --tun=userspace-networking &
 if [ -z "$HEADSCALE_URL" ]; then
   tailscale up --authkey="${TAILSCALE_AUTHKEY}"
 else
-  tailscale up --authkey="${TAILSCALE_AUTHKEY}" --login-server="${HEADSCALE_URL}"
+  tailscale up --authkey="${TAILSCALE_AUTHKEY}" --login-server="${HEADSCALE_URL}" --accept-routes
 fi
 
 # アプリケーション起動

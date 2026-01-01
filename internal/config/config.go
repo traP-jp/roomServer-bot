@@ -11,7 +11,7 @@ type Config struct {
 type DBConfig struct {
 	User     string `env:"NS_MARIADB_USER" envDefault:"user"`
 	Password string `env:"NS_MARIADB_PASSWORD" envDefault:"password"`
-	Host     string `env:"NS_MARIADB_HOST" envDefault:"localhost"`
+	Host     string `env:"NS_MARIADB_HOSTNAME" envDefault:"localhost"`
 	Port     int    `env:"NS_MARIADB_PORT" envDefault:"3306"`
 	Name     string `env:"NS_MARIADB_DATABASE" envDefault:"database"`
 }
