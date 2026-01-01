@@ -7,7 +7,7 @@ RUN go mod download
 
 # ビルド
 COPY . .
-RUN go build -o app ./cmd/main.go
+RUN CGO_ENABLED=0 go build -o app ./cmd/main.go
 
 FROM docker.io/library/alpine:3.23.2
 
@@ -22,4 +22,4 @@ RUN apk update \
 	&& chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["./app"]
+CMD ["/app/app"]
