@@ -2,7 +2,7 @@
 set -e
 
 # Tailscale起動
-tailscaled --tun=userspace-networking &
+tailscaled --tun=userspace-networking --socks5-server=localhost:1055 --outbound-http-proxy-listen=localhost:1055 &
 
 # Tailscale接続
 # HEADSCALE_URLが設定されていない場合はデフォルトのTailscaleサーバーに接続
@@ -17,6 +17,11 @@ DB_URL="maria://${NS_MARIADB_USER}:${NS_MARIADB_PASSWORD}@${NS_MARIADB_HOSTNAME}
 atlas migrate apply \
   --url "${DB_URL}" \
   --dir "file:///app/migrations"
+
+# プロキシ設定
+export ALL_PROXY=socks5://localhost:1055/
+export HTTP_PROXY=http://localhost:1055/
+export http_proxy=http://localhost:1055/
 
 # アプリケーション起動
 exec "$@"
