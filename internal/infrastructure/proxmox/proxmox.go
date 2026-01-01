@@ -18,6 +18,9 @@ type ProxmoxService struct {
 func NewProxmoxService(endpoint, tokenID, secret string, insecure bool) domain.ProxmoxService {
 	insecureHTTPClient := http.Client{
 		Transport: &http.Transport{
+			// 環境変数からプロキシ設定を取得
+			// 明示的に指定しないと環境変数が無視されるため
+			Proxy: http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: insecure,
 			},
