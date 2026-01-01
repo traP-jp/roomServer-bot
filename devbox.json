@@ -12,7 +12,9 @@
     "scripts": {
       "setup-db": ["mysql -u root < scripts/setup.sql"],
       "atlas-apply": ["atlas schema apply --env local"],
-      "sqlc-generate": ["sqlc generate"]
+      "sqlc-generate": ["sqlc generate"],
+      "start": ["go run cmd/main.go"],
+      "build": ["go build -o bin/app cmd/main.go"]
     }
   }
 }
