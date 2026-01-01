@@ -12,5 +12,11 @@ else
   tailscale up --authkey="${TAILSCALE_AUTHKEY}" --login-server="${HEADSCALE_URL}" --accept-routes
 fi
 
+# Atlas DBマイグレーション実行
+DB_URL="maria://${NS_MARIADB_USER}:${NS_MARIADB_PASSWORD}@${NS_MARIADB_HOSTNAME}:${NS_MARIADB_PORT}/${NS_MARIADB_DATABASE}"
+atlas migrate apply \
+  --url "${DB_URL}" \
+  --dir "file:///app/migrations"
+
 # アプリケーション起動
 exec "$@"

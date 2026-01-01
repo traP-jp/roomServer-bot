@@ -11,9 +11,13 @@ RUN CGO_ENABLED=0 go build -o app ./cmd/main.go
 
 FROM docker.io/library/alpine:3.23.2
 
+# Atlasをインストール
+COPY --from=arigaio/atlas:1.0.0 /atlas /usr/local/bin/atlas
+
 # 実行環境構築
 WORKDIR /app
 COPY --from=builder /app/app .
+COPY migrations ./migrations
 COPY docker/entrypoint.sh /entrypoint.sh
 
 # Tailscaleをインストール

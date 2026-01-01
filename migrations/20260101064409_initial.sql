@@ -1,0 +1,4 @@
+-- Create "vm_templates" table
+CREATE TABLE `vm_templates` (`vmid` int unsigned NOT NULL, `name` varchar(100) NOT NULL, PRIMARY KEY (`vmid`)) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
+-- Create "instances" table
+CREATE TABLE `instances` (`vmid` int unsigned NOT NULL, `user_id` varchar(100) NOT NULL, `template_vmid` int unsigned NOT NULL, `created_at` timestamp NULL DEFAULT (current_timestamp()), PRIMARY KEY (`vmid`), INDEX `instances_vm_templates_FK` (`template_vmid`), CONSTRAINT `instances_vm_templates_FK` FOREIGN KEY (`template_vmid`) REFERENCES `vm_templates` (`vmid`) ON UPDATE CASCADE ON DELETE RESTRICT) CHARSET utf8mb4 COLLATE utf8mb4_unicode_ci;
