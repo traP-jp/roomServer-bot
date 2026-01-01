@@ -100,7 +100,7 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 		inst, ipAddress, err := c.vmUsecase.CreateVM(ctx, userID, uint32(id))
 		if err != nil {
 			slog.Error("Failed to create VM", "error", err)
-			_ = c.chatSvc.EditMessage(ctx, messageID, ":exclamation: VM作成に失敗しました。")
+			_ = c.chatSvc.EditMessage(ctx, botMessageID, ":exclamation: VM作成に失敗しました。")
 			c.AddReaction(ctx, messageID, c.errorStampID)
 			return
 		}
