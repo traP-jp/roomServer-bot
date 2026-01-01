@@ -22,6 +22,8 @@ atlas migrate apply \
 export ALL_PROXY=socks5://localhost:1055/
 export HTTP_PROXY=http://localhost:1055/
 export http_proxy=http://localhost:1055/
+export HTTPS_PROXY=http://localhost:1055/
+export https_proxy=http://localhost:1055/
 
 # アプリケーション起動
 exec "$@"
