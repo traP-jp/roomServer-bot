@@ -2,7 +2,7 @@
 set -e
 
 # Tailscale起動
-tailscaled &
+tailscaled --tun=userspace-networking &
 
 # Tailscale接続
 # HEADSCALE_URLが設定されていない場合はデフォルトのTailscaleサーバーに接続

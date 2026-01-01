@@ -18,7 +18,7 @@ COPY docker/entrypoint.sh /entrypoint.sh
 
 # Tailscaleをインストール
 RUN apk update \
-	&& apk add --no-cache tailscale=1.90.9-r1 \
+	&& apk add --no-cache tailscale=1.90.9-r1 iptables=1.8.11-r1 \
 	&& chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
