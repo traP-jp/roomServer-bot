@@ -79,23 +79,33 @@ func (c *TraqController) executeCommand(ctx context.Context, command string, mes
 
 	switch parts[0] {
 	case "/create": // VM作成コマンド
-		c.HandleCreate(ctx, parts, messageID, channelID, userID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.HandleCreate(ctx, parts, messageID, channelID, userID)
+		})
 
 	case "/ls": // 一覧表示コマンド
-		c.HandleList(ctx, parts, channelID, messageID, userID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.HandleList(ctx, parts, channelID, messageID, userID)
+		})
 
 	case "/start": // VM起動コマンド
-		c.HandleStart(ctx, parts, messageID, channelID, userID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.HandleStart(ctx, parts, messageID, channelID, userID)
+		})
 
 	case "/stop": // VM停止コマンド
-		c.HandleStop(ctx, parts, messageID, channelID, userID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.HandleStop(ctx, parts, messageID, channelID, userID)
+		})
 
 	case "/delete": // VM削除コマンド
-		c.HandleDelete(ctx, parts, messageID, channelID, userID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.HandleDelete(ctx, parts, messageID, channelID, userID)
+		})
 
 	case "/help": // ヘルプコマンド
-		_ = c.AddReaction(ctx, messageID, c.loadingStampID)
-		c.sendHelpMessage(ctx, channelID)
-		_ = c.AddReaction(ctx, messageID, c.completedStampID)
+		c.ExecuteWithReactions(ctx, messageID, func() error {
+			return c.sendHelpMessage(ctx, channelID)
+		})
 	}
 }
