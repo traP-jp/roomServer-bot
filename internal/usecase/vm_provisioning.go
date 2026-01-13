@@ -94,8 +94,9 @@ func (u *VMProvisioningUsecase) CreateVM(ctx context.Context, userID string, tem
 		return domain.Instance{}, "", fmt.Errorf("template %d not found: %w", templateVmid, err)
 	}
 
-	// 新しいVMIDを時刻から生成
-	newVmID := uint32((uint64(time.Now().Unix()) % 900000) + 100000)
+	// 新しいVMIDを2026-01-01 00:00:00からの経過秒で生成
+	base := time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC)
+	newVmID := uint32(time.Now().Unix() - base.Unix())
 
 	// テンプレート名からVM名を生成
 	name := strings.ToLower(strings.TrimSpace(tpl.Name))
