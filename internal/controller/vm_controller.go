@@ -2,9 +2,12 @@ package controller
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strconv"
+
+	"github.com/trap-jp/roomserver-bot/internal/domain"
 )
 
 // HandleCreate は /create コマンドを処理する
@@ -50,6 +53,11 @@ func (c *TraqController) HandleStart(ctx context.Context, parts []string, messag
 	// VM起動処理
 	ip, err := c.vmUsecase.StartVM(ctx, userID, uint32(vmid))
 	if err != nil {
+		if errors.Is(err, domain.ErrNotOwner) {
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":no_entry: このVMを所有していません。")
+			slog.Warn("VM ownership check failed", "error", err, "vmid", vmid)
+			return err
+		}
 		slog.Error("Failed to start VM", "error", err, "vmid", vmid)
 		_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM起動に失敗しました。\nVMIDが正しいか確認してください。")
 		return err
@@ -75,6 +83,11 @@ func (c *TraqController) HandleStop(ctx context.Context, parts []string, message
 	// VM停止処理
 	err = c.vmUsecase.StopVM(ctx, userID, uint32(vmid))
 	if err != nil {
+		if errors.Is(err, domain.ErrNotOwner) {
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":no_entry: このVMを所有していません。")
+			slog.Warn("VM ownership check failed", "error", err, "vmid", vmid)
+			return err
+		}
 		slog.Error("Failed to stop VM", "error", err, "vmid", vmid)
 		_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM停止に失敗しました。\nVMIDが正しいか確認してください。")
 		return err
@@ -100,6 +113,11 @@ func (c *TraqController) HandleDelete(ctx context.Context, parts []string, messa
 	// VM削除処理
 	err = c.vmUsecase.DeleteVM(ctx, userID, uint32(vmid))
 	if err != nil {
+		if errors.Is(err, domain.ErrNotOwner) {
+			_, _ = c.chatSvc.SendMessage(ctx, channelID, ":no_entry: このVMを所有していません。")
+			slog.Warn("VM ownership check failed", "error", err, "vmid", vmid)
+			return err
+		}
 		slog.Error("Failed to delete VM", "error", err, "vmid", vmid)
 		_, _ = c.chatSvc.SendMessage(ctx, channelID, ":exclamation: VM削除に失敗しました。\nVMIDが正しいか、またVMが停止しているか確認してください。")
 		return err

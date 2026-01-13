@@ -162,7 +162,7 @@ func (u *VMProvisioningUsecase) StartVM(ctx context.Context, userID string, vmid
 	}
 
 	if !owned {
-		return "", fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+		return "", fmt.Errorf("VM %d is not owned by user %s: %w", vmid, userID, domain.ErrNotOwner)
 	}
 
 	// VM起動
@@ -207,7 +207,7 @@ func (u *VMProvisioningUsecase) StopVM(ctx context.Context, userID string, vmid 
 	}
 
 	if !owned {
-		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+		return fmt.Errorf("VM %d is not owned by user %s: %w", vmid, userID, domain.ErrNotOwner)
 	}
 
 	// VM停止
@@ -235,7 +235,7 @@ func (u *VMProvisioningUsecase) DeleteVM(ctx context.Context, userID string, vmi
 	}
 
 	if !owned {
-		return fmt.Errorf("VM %d is not owned by user %s", vmid, userID)
+		return fmt.Errorf("VM %d is not owned by user %s: %w", vmid, userID, domain.ErrNotOwner)
 	}
 
 	// Proxmox上でVM削除
